@@ -26,7 +26,7 @@ var Table = React.createClass({
           var cells = keys.map(function(el) {				
             return <td key={el}>{item[el]}</td>;
          });           
-        return <tr key={item.id}>{cells}</tr>;
+        return <tr key={item[keys[0]]}}>{cells}</tr>;
        });
     }
 });
