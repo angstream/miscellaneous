@@ -11,6 +11,12 @@
 			rsArray = rs.GetRows() 
 			rowIndex = 0
 		End If
+		
+		'Array is empty	
+		If Not IsArray(rsArray) Then		
+			JSONData = ""
+			Exit Function
+		End if
 			' Retrieve the total no. of rows (second dimension of the array)
 			rowCount = ubound(rsArray,2)
 			'Retrive the total no. of columns/fields (first dimension of the array)
