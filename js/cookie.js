@@ -10,9 +10,9 @@ function setCookie (cname, cvalue, exdays, maxLimit) {
 	    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 	    return;
 	}
-	//console.log("parts1:" + parts);	
+
 	parts = parts.split(",");	
-	//console.log("parts2:" + parts);	
+	
 	if (parts.length > 0) {	    
 	    for (var i=0; i<parts.length; i++) {
 	        if (cvalue == parts[i]) {
