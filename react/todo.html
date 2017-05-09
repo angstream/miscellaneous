@@ -112,7 +112,15 @@
 				}
 				event.preventDefault();
 				
-				var val = this.state.todoItem.trim();				
+				var val = this.state.todoItem.trim();
+				
+				if(val == '')
+					return;				
+				
+				//do not allow duplicates				
+				if (this.state.items.filter(e => e.text == val).length > 0) 		
+					return;
+				
 				this.state.items.push ({
 					text: val,
 					key: Date.now()
