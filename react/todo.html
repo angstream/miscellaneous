@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+  <title>React! React! React!</title>
+    <meta charset="UTF-8">
+ 
+  <script src="https://unpkg.com/react@latest/dist/react.js"></script>
+  <script src="https://unpkg.com/react-dom@latest/dist/react-dom.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  
+  <style>
+	#container {
+		margin : 0px 2px;
+	}
+	body {
+	  padding: 50px;
+	  background-color: #e2f1f3;
+	  font-family: sans-serif;
+	}
+	todoListMain {
+		border: 5px solid red;
+	}
+	.todoListMain .header input {
+	  padding: 10px;
+	  font-size: 14px;
+	  border: 2px solid #FFF;
+	}
+	.todoListMain .header button {
+		  padding: 10px;
+		  font-size: 16px;
+		  margin: 10px;
+		  background-color: #0066FF;
+		  color: #FFF;
+		  border: 2px solid #0066FF;
+	}
+	 
+	.todoListMain .header button:hover {
+		  background-color: #003399;
+		  border: 2px solid #003399;
+		  cursor: pointer;
+	}
+	
+	.todoListMain .theList {
+	  list-style: none;
+	  padding-left: 0;
+	  width: 255px;
+	  border:1px solid gray;
+	}
+	 
+	.todoListMain .theList li {
+	  color: #333;
+	  background-color: rgba(255,255,255,.5);
+	  padding: 15px;
+	  margin-bottom: 5px;
+	  border-radius: 5px;
+	}
+  </style>
+</head>
+  
+<body>  
+  <div style='padding:10px;'>Simple React To Do Demo </div>	
+  <div id="container">
+  
+  </div>
+  
+  <script type="text/babel">
+		var destination = document.querySelector("#container"); 
+		class TodoItems extends React.Component{	
+		  
+		  render () {				
+				var todoEntries = this.props.entries;
+				if(!todoEntries || todoEntries.length ==0){
+					return <p>Add Items</p>
+				}
+					 
+				 function createTasks(item) {
+					return <li key={item.key}>{item.text}</li>
+				}
+				
+				var listItems = todoEntries.map(createTasks);
+				 return (
+					  <ul className="theList">
+						{listItems}
+					  </ul>
+					);
+				}
+		};
+		
+		const ENTER_KEY =13;
+		
+		class TodoList extends React.Component {
+			
+			constructor (props){
+				super(props);
+				
+				this.state  ={					
+					items: [],
+					todoItem:""
+				}	
+				this.handleChange = this.handleChange.bind(this);
+				this.handleNewTodoKeyDown = this.handleNewTodoKeyDown.bind(this);		
+			}   										
+			
+			handleChange(event){
+				this.setState({ todoItem: event.target.value });				
+			}
+			handleNewTodoKeyDown(event){
+			
+				if (event.keyCode !== ENTER_KEY) {
+					return;
+				}
+				event.preventDefault();
+				
+				var val = this.state.todoItem.trim();				
+				this.state.items.push ({
+					text: val,
+					key: Date.now()
+				});
+				
+				this.setState ({
+					items: this.state.items
+				})							
+				this.state.todoItem = "";				
+			}
+			
+			render() {
+				  return (
+					<div className="todoListMain">
+					  <div className="header">
+						<form>
+						  <input						
+								value={this.state.todoItem}
+								onChange={this.handleChange}	
+								onKeyDown={this.handleNewTodoKeyDown}							
+								autoFocus={true}								
+								placeholder="enter task">
+						  </input>
+						</form>
+					  </div>						
+					  <TodoItems entries={this.state.items}/>					
+					</div>
+				  );
+			}
+		}	
+		
+	   ReactDOM.render(<div><TodoList/></div>,destination);
+
+  </script>
+</body>
+  
+</html>
