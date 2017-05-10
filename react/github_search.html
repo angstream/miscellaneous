@@ -118,17 +118,13 @@ class UsersTable extends React.Component {
 class SearchBar extends React.Component {
   constructor(props) {
     super(props);
-    this.handleFilterTextInputChange = this.handleFilterTextInputChange.bind(this);
-    this.handleInStockInputChange = this.handleInStockInputChange.bind(this);
+    this.handleFilterTextInputChange = this.handleFilterTextInputChange.bind(this);  
   }
   
   handleFilterTextInputChange(e) {
     this.props.onFilterTextInput(e.target.value);
   }
-  
-  handleInStockInputChange(e) {
-    this.props.onInStockInput(e.target.checked);
-  }
+
   
   render() {
     return (
@@ -191,10 +187,8 @@ class Setup extends React.Component {
 					<div className="row">
 						<div className="col-sm-3 col-md-6">											
 							    <SearchBar
-							          filterText={this.state.filterText}
-							          inStockOnly={this.state.inStockOnly}
-							          onFilterTextInput={this.handleFilterTextInput}
-							          onInStockInput={this.handleInStockInput}
+							          filterText={this.state.filterText}							       
+							          onFilterTextInput={this.handleFilterTextInput}							          
 								/>
 								Results:{this.state.users.length}	
 							 <UsersTable 
@@ -210,10 +204,8 @@ class Setup extends React.Component {
 			  );
 		}
     return <div className="container">   <SearchBar
-							          filterText={this.state.filterText}
-							          inStockOnly={this.state.inStockOnly}
-							          onFilterTextInput={this.handleFilterTextInput}
-							          onInStockInput={this.handleInStockInput}
+							          filterText={this.state.filterText}						
+							          onFilterTextInput={this.handleFilterTextInput}							          
 								/></div>
    }
 }
