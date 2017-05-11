@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+  <title>React To Do</title>
+    <meta charset="UTF-8">
+ 
+  <script src="https://unpkg.com/react@latest/dist/react.js"></script>
+  <script src="https://unpkg.com/react-dom@latest/dist/react-dom.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  
+  <style>
+	#container {
+		margin : 0px 2px;
+	}
+	body {
+	  padding: 50px;
+	  background-color: #e2f1f3;
+	  font-family: sans-serif;
+	}
+	
+	
+	button {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		background: none;
+		font-size: 100%;
+		vertical-align: baseline;
+		font-family: inherit;
+		font-weight: inherit;
+		color: inherit;
+		-webkit-appearance: none;
+		appearance: none;
+		-webkit-font-smoothing: antialiased;
+		-moz-font-smoothing: antialiased;
+		font-smoothing: antialiased;
+	}
+
+	todoListMain {
+		border: 5px solid red;
+	}
+	.todoListMain .header input {
+	  padding: 10px;
+	  font-size: 14px;
+	  border: 2px solid #FFF;
+	}
+	.todoListMain .header button {
+		  padding: 10px;
+		  font-size: 16px;
+		  margin: 10px;
+		  background-color: #0066FF;
+		  color: #FFF;
+		  border: 2px solid #0066FF;
+	}
+	 
+	.todoListMain .header button:hover {
+		  background-color: #003399;
+		  border: 2px solid #003399;
+		  cursor: pointer;
+	}
+	
+	.todoListMain .theList {
+	  list-style: none;
+	  padding-left: 0;
+	  width: 255px;
+	  border:1px solid gray;
+	}
+	 
+	.todoListMain .theList li {
+	  color: #333;
+	  background-color: rgba(255,255,255,.5);
+	  padding: 5px;
+	  margin-bottom: 5px;
+	  border-radius: 5px;
+	}
+	
+	.theList li label {
+		white-space: pre-line;
+		word-break: break-all;
+		padding: 5px ;
+		margin-left: 15px;
+		display: block;
+		line-height: 1.2;
+		transition: color 0.4s;
+	}
+
+	.theList li .destroy {
+		display: none;
+		position: static;
+		top: 0;
+		right: 10px;
+		bottom: 0;
+		width: 40px;
+		height: 40px;
+		margin: auto 0;
+		font-size: 20px;
+		color: #cc9a9a;
+		margin-bottom: 1px;
+		transition: color 0.2s ease-out;
+	}
+
+	.theList li .destroy:hover {
+		color: #af5b5e;
+	}
+
+	.theList li .destroy:after {content: 'x';}
+	
+	.theList li:hover .destroy {display: block;}
+  </style>
+</head>
+  
+<body>  
+  <div style='padding:10px;'>To Do </div>	
+  <div id="container">
+  
+  </div>
+  
+  <script type="text/babel">
+/*
+  		var extend = function () {
+			var newObj = {};
+			for (var i = 0; i < arguments.length; i++) {
+				var obj = arguments[i];
+				for (var key in obj) {
+					if (obj.hasOwnProperty(key)) {
+						newObj[key] = obj[key];
+					}
+				}
+			}
+			return newObj;
+		}
+		*/
+		var destination = document.querySelector("#container"); 
+		
+		class ToDoItem extends React.Component {
+			constructor(props){			
+				super(props);				
+				this.removeItem = this.removeItem.bind(this);
+			}
+			
+			removeItem() {	   
+			  //console.log("on handleClickInput:" + this.props.item.key);
+			  this.props.onHandleClickInput(this.props.item.key);			
+			}
+			
+			render () {
+				var item = this.props.item;
+				return <li key={item.key}>
+							<label>{item.text}</label>
+							<button className="destroy" onClick ={this.removeItem}/>
+							</li>			
+			}	  
+		  
+		}
+
+		class TodoItems extends React.Component{			  	  
+		  constructor(props){
+			super(props);
+			this.handleClickInput = this.handleClickInput.bind(this);
+		  }
+		  
+		  handleClickInput(key){
+			//console.log("TodItems handleClickInput:" + key);  
+			 this.props.onHandleClickInput(key);			
+		  }		  
+		  render () {				
+				var todoEntries = this.props.entries;
+				if(!todoEntries || todoEntries.length ==0){
+					return <p>Add Items </p>
+				}				 
+					
+				var listItems = [];
+				todoEntries.forEach(a=> 
+					listItems.push (<ToDoItem item = {a} key= {a.key} onHandleClickInput={this.handleClickInput}/> )
+				);			
+								
+				return (
+					  <ul className="theList">
+						{listItems}
+					  </ul>
+					);
+				}
+		};
+		
+		const ENTER_KEY =13;
+		const MY_NAMESPACE ="todo-test";
+		
+		class TodoList extends React.Component {
+			
+			constructor (props){
+				super(props);
+				
+				this.state  ={					
+					items: [],
+					todoItem:""
+				}	
+				this.handleChange = this.handleChange.bind(this);
+				this.handleNewTodoKeyDown = this.handleNewTodoKeyDown.bind(this);	
+				this.handleClickInput = this.handleClickInput.bind(this);
+
+				this.readStore();				
+			}   										
+			
+			componentDidMount() { 
+				//this._mounted = true;
+				console.log("componentDidMount");
+				
+				this.state.items.forEach(a=> console.log(a.text));
+			}
+			
+			//handle the Delete click 
+		   handleClickInput(key){		
+			  //create a new array that does not include the item clicked	
+			  var arr = this.state.items.filter(e => e.key !== key);			  
+			  //call save on setState complete
+			  this.setState ({items : (arr)}, this.save);			
+		   }		
+			
+			handleChange(event){
+				this.setState({ todoItem: event.target.value });				
+			}
+			handleNewTodoKeyDown(event){
+			
+				if (event.keyCode !== ENTER_KEY) {
+					return;
+				}
+				event.preventDefault();
+				
+				var val = this.state.todoItem.trim();				
+				if(val == '')
+					return;
+				
+				//do not allow duplicates				
+				if (this.state.items.filter(e => e.text == val).length > 0) 		
+					return;
+					
+				this.state.items.push ({
+					text: val,
+					key: Date.now()
+				});
+				
+				this.setState ({
+					items: this.state.items
+				})							
+				this.state.todoItem = "";	
+				
+				this.save();	
+			}
+			
+			save () {				
+				this.store (MY_NAMESPACE, this.state.items);
+			}
+			
+			readStore(){
+				this.state.items = this.store(MY_NAMESPACE);
+			}
+			
+			store (namespace, data) {
+				if (data) {
+					return localStorage.setItem(namespace, JSON.stringify(data));
+				}
+
+				var store = localStorage.getItem(namespace);
+				return (store && JSON.parse(store)) || [];
+			}
+			
+			render() {
+				  return (
+					<div className="todoListMain">
+					  <div className="header">
+						<form>
+						  <input						
+								value={this.state.todoItem}
+								onChange={this.handleChange}	
+								onKeyDown={this.handleNewTodoKeyDown}							
+								autoFocus={true}								
+								placeholder="enter task">
+						  </input>
+						</form>
+					  </div>						
+					  <TodoItems entries={this.state.items} onHandleClickInput={this.handleClickInput}/>					
+					</div>
+				  );
+			}
+		}	
+		
+	   ReactDOM.render(<div><TodoList/></div>,destination);
+
+  </script>
+</body>
+  
+</html>
