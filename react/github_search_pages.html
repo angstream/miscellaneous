@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello World</title>
+    <script src="https://unpkg.com/react@latest/dist/react.js"></script>
+    <script src="https://unpkg.com/react-dom@latest/dist/react-dom.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<style>
+	.pagination {
+		display: inline-block;
+	}
+
+	.pagination a {
+		color: black;
+		float: left;
+		padding: 4px 8px;
+		text-decoration: none;
+	}
+
+	.pagination a.active {
+		background-color: #4CAF50;
+		color: white;
+		border-radius: 5px;
+	}
+
+	.pagination a:hover:not(.active) {
+		background-color: #ddd;
+		border-radius: 5px;
+	}
+
+	
+	</style>
+  </head>
+  <body>
+	 <h3>React Search And Master Detail Demo </h3>	
+	 <div id="root">
+	
+	 </div>	
+	 <div id="detail"></div>
+ 
+ <script type="text/babel">
+
+
+function getUsersFromApiAsync(val) {
+    return fetch('https://api.github.com/search/users?q=' + val)
+      .then((response) => response.json())
+      .then((responseJson) => {
+        return responseJson;
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }  
+  
+class Detail extends React.Component{
+	
+	render (){			
+	if(this.props.product){
+		var user = this.props.product;
+		return (	<div className="card">
+			<h3> Detail </h3>
+			<ul className="list-group">
+				<li className="list-group-item"> {user.id} </li>
+				<li className="list-group-item"> {user.login} </li>
+				<li className="list-group-item"> {user.score} </li>
+				<li className="list-group-item"> <a href={user.url} target="_BLANK">{user.url}</a> </li>
+				<li className="list-group-item"> {user.avatar_url} </li>				
+			</ul>
+			</div>
+		);
+	}
+	return (<div>Click on any item in the left pane for details </div>);
+	}
+}
+
+class UserRow extends React.Component {
+	constructor(props){
+		super(props);
+		this.handleClick = this.handleClick.bind(this);   
+	}
+    
+   handleClick(e, id) {
+     this.setState({id: id});	
+	 this.props.onHandleClickInput(id);
+  }
+
+  render() {
+    var name = this.props.product.id ;
+
+    return (
+      <tr onClick={(e)=> this.handleClick(e, name)}>       
+		<td>{name}</td>
+        <td>{this.props.product.login}</td>
+      </tr>
+    );
+  }
+}
+
+class UsersTable extends React.Component {
+	constructor(props){
+		super(props);
+	    this.handleClickInput = this.handleClickInput.bind(this);
+	}
+  
+	handleClickInput(id) {	   
+	  this.props.onHandleClickInput(id);
+	    this.setState({
+	      id: id
+	    })
+    }
+	
+  render() {
+    var rows = [];
+    var lastCategory = null;
+
+    if(this.props.users && this.props.users.length>0){
+		this.props.users.forEach((product) => {      
+	      rows.push(<UserRow 
+						product={product} 
+						key={product.id} 
+						onHandleClickInput = {this.handleClickInput}				
+					/>);  
+	    });
+	}
+    return (
+      <table className="table">
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Login</th>
+          </tr>
+        </thead>
+        <tbody>{rows}</tbody>
+      </table>
+    );
+  }
+}
+
+
+
+class SearchBar extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleFilterTextInputChange = this.handleFilterTextInputChange.bind(this);
+  }
+  
+  handleFilterTextInputChange(e) {
+    this.props.onFilterTextInput(e.target.value);
+  }
+  
+  
+  render() {
+    return (
+      <form>
+        <input
+          type="text"
+          placeholder="Search for users ..."
+          value={this.props.filterText}
+          onChange={this.handleFilterTextInputChange}
+        />
+       
+      </form>
+    );
+  }
+}
+
+function print(obj){
+	console.log(obj.toString() +  " "+ obj);
+}
+
+class Setup extends React.Component {
+   constructor (props){
+		super(props);
+		this.state  ={
+			id:0,
+			users:null,
+			product:null,
+			filterText:"",
+			currentPage: 1,
+			itemsPerPage: 10
+		}
+		this.handleFilterTextInput = this.handleFilterTextInput.bind(this);
+		this.handleClickInput = this.handleClickInput.bind(this);
+		//paging functions
+		this.handlePageClick = this.handlePageClick.bind(this);
+		this.handleForwardClick = this.handleForwardClick.bind(this);
+		this.handleBackClick = this.handleBackClick.bind(this);
+   }   
+   componentDidMount() {
+		console.log("filterText:"+ this.state.filterText);		 
+   }		
+
+ 
+	handleFilterTextInput(filterText) {	
+		if(filterText && filterText.length>2)		 
+			getUsersFromApiAsync(filterText).then(response =>{ 			
+				 this.setState ({
+					 users: response.items,
+					 totalPages: Math.ceil(response.items.length / this.state.itemsPerPage) 				
+				 });
+			});		
+	    
+		this.setState({
+	      filterText: filterText
+	    });
+	
+  }
+    handleClickInput(id) {
+		var prod = this.state.users.filter (sub => sub.id ==id)[0];
+	    this.setState({
+	        product:prod		
+	    });
+    }
+	
+	handlePageClick(event) {
+		this.setState({
+		  currentPage: Number(event.target.id)
+		});
+	}
+	
+	handleBackClick(){
+	
+		if(this.state.currentPage >1)
+			this.setState({currentPage:this.state.currentPage-1})
+	}
+	
+	handleForwardClick(){	
+		if(this.state.currentPage<this.state.totalPages)
+			this.setState({currentPage:this.state.currentPage+1})
+	}
+
+	render () {						
+		
+			//https://stackoverflow.com/a/40234427
+		const { id, currentPage, itemsPerPage } = this.state;
+		  // Logic for displaying items
+       const indexOfLastItem = currentPage * itemsPerPage;
+       const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+		
+		// Logic for displaying page numbers
+		const pageNumbers = [];
+		//const totalPages = Math.ceil(this.props.users.length / itemsPerPage);		
+		const totalPages = this.state.totalPages;
+		for (let i = 1; i <= totalPages; i++) {
+			pageNumbers.push(i);
+		}	
+		
+		const renderPageNumbers = pageNumbers.map(number => {
+		  return (
+			<a
+			  key={number}
+			  id={number}
+			  onClick={this.handlePageClick}
+			>
+			  {number}
+			</a>
+		  );
+		});
+		
+		const renderPagination = <div className="pagination"> 
+				<p>Page: {this.state.currentPage}</p>
+				<a onClick={this.handleBackClick} href="#">&laquo;</a> 
+						{renderPageNumbers}   
+					<a onClick={this.handleForwardClick} href="#">&raquo;</a>
+				</div>;				
+		
+	    if (this.state.users && this.state.users.length >0) {   	
+			const currentItems = this.state.users.slice(indexOfFirstItem, indexOfLastItem); 				
+			  return (
+			  <div className="container"> 
+					<div className="row">
+						<div className="col-sm-3 col-md-6">											
+							    <SearchBar
+							          filterText={this.state.filterText}							     
+							          onFilterTextInput={this.handleFilterTextInput}							        
+								/>
+								Results:{this.state.users.length}	
+							 <UsersTable 									
+									users = {currentItems}
+									onHandleClickInput={this.handleClickInput}
+							 />		
+							 {renderPagination}	
+						</div>							
+						<div className="col-sm-3 col-md-6">		 
+							<Detail product={this.state.product}/>
+						</div>	
+					</div> 					 
+				</div>		
+			  );
+		}
+    return <div className="container"><SearchBar
+							          filterText={this.state.filterText}							        
+							          onFilterTextInput={this.handleFilterTextInput}							      
+								/></div>
+   }
+}
+
+	ReactDOM.render(<Setup />,document.getElementById('root'));
+
+</script>
+	<div id="container"></div>
+  </body>
+</html>
