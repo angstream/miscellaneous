@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>The greatest news app ever</title>
+
+	 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div class="container" id="app">		
+		<h3 class="text-center">Vue</h3> 
+		
+		<div style='margin-left:2px'> 	
+			<input v-model="message">
+			<p>{{ message }}</p>
+		</div>
+
+		<div class="container"> 
+					<div class="row">
+						<div class="col-sm-3 col-md-6">											
+							   <ul v-for="result in results">
+									<li v-on:click="say(result)"> {{ result.id }} - {{ result.login }} </li>
+							</ul>
+							
+						</div>							
+						<div class="col-sm-3 col-md-6" >		 
+							<h3>Details </h3>
+							<ul>
+								<li>{{currentItem.id}}
+								<li>{{currentItem.login}}
+								<li>{{currentItem.score}}
+								<li>{{currentItem.url}}
+							</ul>
+							
+						</div>	
+					</div> 					 
+				</div>		
+		
+		
+    </div>
+	<script src="https://unpkg.com/vue"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script>	
+		
+		const url= "https://api.github.com/search/users?q=";
+		
+		const getUrl = txt =>  url + txt;
+	
+		
+		const vm = new Vue({
+		  el: '#app',
+		  data: {
+			results: [],
+			message:'',
+			 name: 'Vue.js',
+			 currentItem:{}
+		  },
+	
+
+		  methods:{	
+			 
+			 say: function (item) {				
+				this.currentItem =item;							
+			}	
+		  },
+		  
+		  mounted() {
+			console.log("mounted");									
+		  }
+		});
+		
+		const readUrl = txt =>  axios.get(getUrl(txt)).then(response => {vm.results = response.data.items})	
+		
+		vm.$watch('message', function (newVal, oldVal) {
+			
+			if(newVal.length >2 && newVal.length> oldVal.length){
+				console.log("watch:"+newVal);
+				readUrl(newVal);
+			}
+		})
+	</script>
+  </body>
+</html>
