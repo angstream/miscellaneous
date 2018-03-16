@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>VBScript Properties Generator</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.3.1/css/foundation.min.css">
+  </head>
+  <body>
+    <div class="container" id="app">		
+		<h4 class="text-center">Chrome Only </h4> 
+		
+		<div style='margin-left:10px'> 										
+			<textarea v-model="message" id="prop" autofocus placeholder="add multiple lines"  rows="8" cols="10"></textarea>						
+			<textarea v-model="computedResult"  rows="20" cols="40"></textarea>								
+		</div>		
+		
+    </div>
+	<script src="https://unpkg.com/vue"></script>
+	<script>	
+		
+		"use strict";
+
+var vm = new Vue({
+	el: '#app',
+	data: {		
+		message: '',		
+		result: '',		
+	},
+	computed: {
+		computedResult () {
+			var arr = this.message.split('\n');		
+			return this.generate (arr);		  
+		}
+	},
+	methods: {		
+			
+		enterPressed (e){		
+			let arr = this.message.split('\n');		
+			this.generate (arr);
+		},
+		capitalizeFirstLetter(string) {
+			return string.charAt(0).toUpperCase() + string.slice(1);
+		},
+		
+		createProp (name){
+			//get the first element only 	
+			let propName = this.capitalizeFirstLetter(name.split(" ")[0]);
+			let privateMember =  "m_" + propName;	
+			
+			let privateProp = "Private " + privateMember + "\n\n";		
+			let letProp =  "Public Property Let " + propName + " (data)\n    " + privateMember + " = data \n" + "End Property\n\n" ;
+			let getProp =  "Public Property Get " + propName + "\n    " + propName + " = " + privateMember + "\n" + "End Property\n\n" ;
+		
+			return	[privateProp,letProp, getProp];
+		},
+		
+		generate (arr){										
+			return arr.filter (it => it.length >0).map (this.createProp).map(e=> e.join('')).join('');			
+		}		
+	},
+	mounted: function () {
+	
+	}
+});
+	</script>
+  </body>
+</html>
