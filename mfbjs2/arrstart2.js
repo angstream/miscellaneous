@@ -18,3 +18,14 @@ for (var i = 0; i < arr.length; i++) {
 prt(count);
 prt(hash);
 
+
+let hash2 = {};
+for (var i = 0; i < arr.length; i++) {
+  hash2[arr[i]] = "";
+}
+let count2 = 0;
+for (var i = 0; i < arr.length; i++) {
+  let value = k - arr[i];
+  if (value in hash2) count2++;
+}
+prt(count2 / 2);
