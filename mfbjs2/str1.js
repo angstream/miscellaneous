@@ -1,32 +1,39 @@
 const prt = (s) => console.log(s);
 
+function compareStrings(s, t) {
+  for (var i = 0; i < t.length; i++) {}
+}
+
 function findMatch(s, t) {
   var h1 = {};
-  var h2 = {};
+  var arr = [...s];
   for (var i = 0; i < s.length; i++) {
     h1[s[i]] = i;
   }
-  prt(h1);
 
   var flag = true;
   var count = 0;
   for (var i = 0; i < t.length; i++) {
     var value = t[i];
-
-    if (s[i] != value) {
-      if (!flag) break;
+    if (arr[i] == value) count++;
+    else if (flag) {
       if (h1[value]) {
-        s[h1[value]] = s[i];
-        s[i] = value;
+        arr[h1[value]] = s[i];
+        arr[i] = value;
         count++;
         flag = false;
-      } else break;
+      }
     }
-    count++;
   }
-  prt(s);
+  if (flag && arr.length > 1) {
+    var temp = s[1];
+    s[1] = s[0];
+    s[0] = temp;
+  }
+  //prt(arr);
   return count;
 }
 
-var result = findMatch("abcd", "adcb");
+var str1 = "abcde";
+var result = findMatch(str1, "adcbf");
 prt(result);
