@@ -26,14 +26,26 @@ function findMatch(s, t) {
     }
   }
   if (flag && arr.length > 1) {
-    var temp = s[1];
-    s[1] = s[0];
-    s[0] = temp;
+    var temp = arr[1];
+    arr[1] = arr[0];
+    arr[0] = temp;
+    count = 0;
+    for (var i = 0; i < t.length; i++) {
+      if (arr[i] == t[i]) count++;
+    }
   }
   //prt(arr);
   return count;
 }
 
 var str1 = "abcde";
-var result = findMatch(str1, "adcbf");
+var str2 = "adcbf";
+var result = findMatch(str1, str2);
 prt(result);
+str1 = "mnoa";
+str2 = "mnoa";
+result = findMatch(str1, str2);
+prt(result);
+//const str = "word";
+// prt(str.split(""));
+// prt([...str]);
