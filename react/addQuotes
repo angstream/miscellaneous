@@ -1,0 +1,117 @@
+import React from "react";
+
+function addSingleQuotes(input) {
+  if (!input) return "";
+  const result = input
+    .split(/\r?\n/)
+    .filter((element) => element)
+    .map((it) => `'${it}`);
+
+  const trans = result.join("',\r\n");
+
+  return trans + "'";
+}
+
+function addDoubleQuotes(input) {
+  if (!input) return "";
+  const result = input
+    .split(/\r?\n/)
+    .filter((element) => element)
+    .map((it) => `"${it}`);
+
+  const trans = result.join('",\r\n');
+
+  return trans + '"';
+}
+
+class ListApp extends React.Component {
+  constructor(props) {
+    super(props);
+    this.input = React.createRef();
+  }
+
+  componentDidMount() {
+    this.setState({ type: "single" });
+  }
+
+  inputChange(e) {
+    this.setState({ input: e.target.value });
+  }
+
+  clearInput(e) {
+    this.input.current.value = "";
+    this.setState({ input: "" });
+    e.preventDefault();
+  }
+
+  onChangeQuoteType = (event) => {
+    this.setState({
+      type: event.target.value,
+      input: "",
+    });
+  };
+  render() {
+    const { input } = this.state || "";
+    const { type } = this.state || "";
+
+    let transformFunc = type === "single" ? addSingleQuotes : addDoubleQuotes;
+    let transformedInput = transformFunc(input);
+
+    return (
+      <div className="ui container" style={{ marginTop: "10px" }}>
+        <h3 className="ui header">Add Single Quotes</h3>
+
+        <div className="ui two column grid">
+          <div className="row">
+            <div className="column">
+              <h3>Input</h3>
+              <form className="ui form">
+                <textarea
+                  onChange={(e) => this.inputChange(e)}
+                  name="input"
+                  ref={this.input}
+                  placeholder="input"
+                  style={{ minHeight: "100px" }}
+                  rows="14"
+                ></textarea>
+                <div style={{ marginTop: "10px" }}>
+                  <button
+                    className="ui button"
+                    onClick={(e) => this.clearInput(e)}
+                  >
+                    Clear
+                  </button>
+                </div>
+              </form>
+            </div>
+            <div className="column">
+              <h3>Output</h3>
+              <form className="ui form">
+                <div onChange={this.onChangeQuoteType}>
+                  <input
+                    type="radio"
+                    value="Single"
+                    name="quoteType"
+                    defaultChecked
+                  />
+                  Single Quote
+                  <input type="radio" value="Double" name="quoteType" /> Double
+                  Quote
+                </div>
+
+                <textarea
+                  name="output"
+                  readOnly
+                  style={{ minHeight: "100px" }}
+                  rows="14"
+                  value={transformedInput}
+                ></textarea>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+export { ListApp };
